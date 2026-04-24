@@ -18,11 +18,11 @@ const envSchema = z.object({
     return false
   }),
   GUILD_ID: z.string().optional(),
-  WIKI_URL: z.string().url(),
+  WIKI_URL: z.url(),
   NODE_ENV: z.string(),
 })
 
-function parseEnv(schema: z.ZodSchema) {
+function parseEnv(schema: z.ZodObject<typeof envSchema.shape>) {
   try {
     return schema.parse(process.env)
   } catch (err) {
@@ -31,7 +31,7 @@ function parseEnv(schema: z.ZodSchema) {
       process.exit(1)
     }
 
-    console.error("Invalid environment variables:", err.flatten().fieldErrors)
+    console.error("Invalid environment variables:", z.treeifyError(err))
     process.exit(1)
   }
 }
