@@ -48,6 +48,6 @@ pnpm format
 
 ## Credits
 
-- Hero of Light (formerly Bulbatech)
+- Hero of Lylat (formerly Bulbatech)
 - KenderCharmeleon
 - Originally based on [dan5py](https://github.com/dan5py/discordjs-template-ts)'s template
