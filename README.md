@@ -17,7 +17,7 @@ There are a few message commands, which returns the most suitable result found o
 
 ### Slash commands
 
-- `/revision-specific`: Get a specific revision
+- `/revid`: Get a specific revision
   - **id**: ID of this revision
 - `/search`: Search on Bulbapedia
   - **title**: title for the search
@@ -48,6 +48,6 @@ pnpm format
 
 ## Credits
 
-- Bulbatech
+- Hero of Lylat (formerly Bulbatech)
 - KenderCharmeleon
 - Originally based on [dan5py](https://github.com/dan5py/discordjs-template-ts)'s template

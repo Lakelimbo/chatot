@@ -55,9 +55,9 @@ export class WikiContent extends WikiFetch {
   }
 
   private speciesImage(name: string): string {
-    const image: HTMLImageElement = this.document?.querySelector(
+    const image = this.document?.querySelector(
       `table.infobox img.mw-file-element[alt="${name}"]`
-    )!
+    ) as NonNullable<HTMLImageElement>
 
     return image.src
   }
@@ -65,9 +65,9 @@ export class WikiContent extends WikiFetch {
   private speciesTypes(): string[] {
     const element = this.document?.querySelectorAll(
       "table.infobox tr:nth-child(2) span > b"
-    )!
+    )
 
-    return [...element]
+    return [...element!]
       .slice(0, 2)
       .filter((type) => type.textContent !== "Unknown")
       .map((type) => type.textContent!)
@@ -76,9 +76,9 @@ export class WikiContent extends WikiFetch {
   private speciesAbilities(): string[] {
     const element = this.document?.querySelectorAll(
       "table.infobox tr:nth-child(3) table a > span"
-    )!
+    )
 
-    const table = [...element]
+    const table = [...element!]
       .filter((ability) => ability.textContent !== "Cacophony")
       .map((ability) => ability.textContent!)
 

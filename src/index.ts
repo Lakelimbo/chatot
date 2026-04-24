@@ -26,16 +26,16 @@ const rest = new REST({ version: "10" }).setToken(env.DISCORD_BOT_TOKEN)
 
     const { slashCommands, slashConfigs } = await loadSlashCommands()
 
-    const res: any = await rest.put(
-      Routes.applicationCommands(env.DISCORD_APP_ID),
-      {
-        body: slashCommands,
-      }
-    )
+    const res = await rest.put(Routes.applicationCommands(env.DISCORD_APP_ID), {
+      body: slashCommands,
+    })
 
     client.SlashConfigs = slashConfigs
 
-    Logger.Debug(`Successfully reloaded ${res.length} (/) commands`)
+    // just some casting to stop TS complaining, because `res` for some reason
+    // only god knows why returns `unknown`, and there doesn't seem to be
+    // an appropriate type to handle this better
+    Logger.Debug(`Successfully reloaded ${(res as []).length} (/) commands`)
     client.login(env.DISCORD_BOT_TOKEN)
   } catch (err) {
     Logger.Error(`Error refreshing application (/) commands: \n\t${err}`)

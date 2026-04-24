@@ -1,6 +1,6 @@
 import fs from "fs"
 import path from "path"
-import { Events, type Awaitable } from "discord.js"
+import { DiscordAPIError, Events, type Awaitable } from "discord.js"
 
 import { DiscordClient } from "@/lib/client"
 import { Logger } from "@/lib/logger"
@@ -40,10 +40,10 @@ export function handleEvents() {
           throw new Error(`Missing default export in "${file}"`)
         }
 
-        const eventFunctioon: (...args: any[]) => Awaitable<void> =
+        const eventFunctioon: (...args: unknown[]) => Awaitable<void> =
           eventModule.default
 
-        // @ts-expect-error
+        // @ts-expect-error: just some TS fuckupery
         client.on(Events[eventName], eventFunctioon)
         ++loadedEvents
       } catch (err) {
@@ -59,8 +59,8 @@ export function handleEvents() {
     try {
       const loadedEvents = await loadEvents(directory)
       Logger.Debug(`Loaded ${loadedEvents} events from "${directory}"`)
-    } catch (err: any) {
-      if (err.code === "ENOENT") {
+    } catch (err) {
+      if ((err as DiscordAPIError).code === "ENOENT") {
         return
       }
 

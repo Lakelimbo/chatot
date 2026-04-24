@@ -6,7 +6,7 @@ import { Logger } from "@/lib/logger"
 
 const config: SlashCommandConfig = {
   description: "Get a specific revision through its ID",
-  usage: "/revision-specific",
+  usage: "/revid",
   options: [
     {
       name: "id",
@@ -24,7 +24,7 @@ const command: SlashCommand = {
     await interaction.deferReply()
 
     const id = interaction.options.get("id", true)
-    Logger.Debug(`/revision-specific for "${id.value}"`)
+    Logger.Debug(`/revid for "${id.value}"`)
 
     try {
       const rev = await wiki.getRevisionID(id.value as number)
@@ -77,7 +77,7 @@ const command: SlashCommand = {
         ],
       })
     } catch (err) {
-      Logger.Error(`/revision-specific error for "${id.value}"`, err)
+      Logger.Error(`/revid error for "${id.value}"`, err)
 
       await interaction.editReply({
         content: `An error happened. Please try again.`,

@@ -64,15 +64,31 @@ export class MessageLink {
    */
   async process(): Promise<void> {
     for (const handler of this.linkHandlers) {
-      const matches = [...this.message.content.matchAll(handler.pattern)]
+      // seems like matchAll always will return an object that is larger than
+      // we need, so an easy way to deduplicate this is to just use a loop
+      // and a Map.
+      //
+      // Should not make any performance difference, but if for some reason
+      // someone links way too many pages (like, thousands), it might take
+      // a while (but considering that's unlikely, I will ignore this).
+      const cleaned = this.stripCodeBlocks(this.message.content)
+      const matches = cleaned.matchAll(handler.pattern)
+      const unique = new Map<string, RegExpExecArray>()
+      for (const match of matches) {
+        const key = match[1]
 
-      if (matches.length > 0) {
-        Logger.Debug(
-          `Found ${matches.length} links matching ${handler.pattern}`
-        )
+        if (!unique.has(key)) {
+          unique.set(key, match)
+        }
+      }
+
+      const set = [...unique.values()]
+
+      if (set.length > 0) {
+        Logger.Debug(`Found ${set.length} links matching ${handler.pattern}`)
 
         const currentWhere = handler.where || this.where
-        await this.handle(matches, handler, currentWhere)
+        await this.handle(set, handler, currentWhere)
       }
     }
   }
@@ -108,7 +124,7 @@ export class MessageLink {
             url: `${where}/wiki/${res.key}`,
           })
         })
-      } catch (err) {
+      } catch {
         Logger.Error(`Links for messages not found: ${page}`)
       }
     }
@@ -146,5 +162,12 @@ export class MessageLink {
         allowedMentions: { repliedUser: false },
       })
     }
+  }
+
+  /**
+   * Simple way to take care of code blocks (inline as well)
+   */
+  private stripCodeBlocks(content: string): string {
+    return content.replace(/```[\s\S]*?```/g, "").replace(/`.*?`/g, "")
   }
 }
