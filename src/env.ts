@@ -20,6 +20,14 @@ const envSchema = z.object({
   GUILD_ID: z.string().optional(),
   WIKI_URL: z.url(),
   NODE_ENV: z.string(),
+
+  // if at some point these options grow too much, I'll try to
+  // add a way to read a configuration file, since these aren't
+  // sensitive values
+  ENABLE_REGULAR_WIKILINKS: z.boolean().default(true),
+  ENABLE_FILE_LINKS: z.boolean().default(true),
+  ENABLE_TEMPLATE_LINKS: z.boolean().default(false),
+  ENABLE_MODULE_LINKS: z.boolean().default(false),
 })
 
 function parseEnv(schema: z.ZodObject<typeof envSchema.shape>) {
@@ -37,3 +45,4 @@ function parseEnv(schema: z.ZodObject<typeof envSchema.shape>) {
 }
 
 export const env = parseEnv(envSchema)
+export type EnvSchema = z.ZodObject<typeof envSchema.shape>

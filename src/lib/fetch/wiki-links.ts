@@ -12,51 +12,67 @@ type LinkHandler = {
   resultsMessage?: string
 }
 
+const linkRegexes: Record<string, LinkHandler> = {
+  regularLinks: {
+    pattern: /\[\[(?![Ff]ile:)(.*?)\]\]/g,
+    notFoundMessage: "🤔 Could not find any matching Bulbapedia articles.",
+    resultsMessage: "Pages found in your message:",
+  },
+  fileLinks: {
+    pattern: /\[\[(?:[Ff]ile):(.*?)\]\]/g,
+    where: "https://archives.bulbagarden.net",
+    notFoundMessage:
+      "🤔 Could not find any matching files on Bulbagarden Archives.",
+    resultsMessage: "Files found in your message:",
+  },
+  templateLinks: {
+    pattern: /\{\{(?![Mm]odule:)(.*?)\}\}/g,
+    transform: (match) => {
+      const modified = [...match]
+      modified[1] = `Template:${match[1]}`
+
+      return modified as RegExpMatchArray
+    },
+    notFoundMessage: "🤔 Could not find any matching templates.",
+    resultsMessage: "Templates found in your message:",
+  },
+  moduleLinks: {
+    pattern: /\{\{(?:[Mm]odule):(.*?)\}\}/g,
+    transform: (match) => {
+      const modified = [...match]
+      modified[1] = `Module:${match[1]}`
+
+      return modified as RegExpMatchArray
+    },
+    notFoundMessage: "🤔 Could not find any matching Lua modules.",
+    resultsMessage: "Lua modules found in your message:",
+  },
+}
+
 export class MessageLink {
   private message: Message
   private where: string
 
   // Register all link types with their patterns and handler methods
-  private linkHandlers: LinkHandler[] = [
-    {
-      pattern: /\[\[(?![Ff]ile:)(.*?)\]\]/g,
-      notFoundMessage: "🤔 Could not find any matching Bulbapedia articles.",
-      resultsMessage: "Pages found in your message:",
-    },
-    {
-      pattern: /\[\[(?:[Ff]ile):(.*?)\]\]/g,
-      where: "https://archives.bulbagarden.net",
-      notFoundMessage:
-        "🤔 Could not find any matching files on Bulbagarden Archives.",
-      resultsMessage: "Files found in your message:",
-    },
-    {
-      pattern: /\{\{(?![Mm]odule:)(.*?)\}\}/g,
-      transform: (match) => {
-        const modified = [...match]
-        modified[1] = `Template:${match[1]}`
+  private linkHandlers: LinkHandler[] = []
 
-        return modified as RegExpMatchArray
-      },
-      notFoundMessage: "🤔 Could not find any matching templates.",
-      resultsMessage: "Templates found in your message:",
-    },
-    {
-      pattern: /\{\{(?:[Mm]odule):(.*?)\}\}/g,
-      transform: (match) => {
-        const modified = [...match]
-        modified[1] = `Module:${match[1]}`
-
-        return modified as RegExpMatchArray
-      },
-      notFoundMessage: "🤔 Could not find any matching Lua modules.",
-      resultsMessage: "Lua modules found in your message:",
-    },
-  ]
-
-  constructor(message: Message, where: string = env.WIKI_URL) {
+  constructor(message: Message, where: string = env.WIKI_URL, localEnv = env) {
     this.message = message
     this.where = where
+
+    // if this gets too big, I'll convert it to a smarter function
+    if (localEnv.ENABLE_REGULAR_WIKILINKS) {
+      this.linkHandlers.push(linkRegexes.regularLinks)
+    }
+    if (localEnv.ENABLE_FILE_LINKS) {
+      this.linkHandlers.push(linkRegexes.fileLinks)
+    }
+    if (localEnv.ENABLE_TEMPLATE_LINKS) {
+      this.linkHandlers.push(linkRegexes.templateLinks)
+    }
+    if (localEnv.ENABLE_MODULE_LINKS) {
+      this.linkHandlers.push(linkRegexes.moduleLinks)
+    }
   }
 
   /**
@@ -171,3 +187,5 @@ export class MessageLink {
     return content.replace(/```[\s\S]*?```/g, "").replace(/`.*?`/g, "")
   }
 }
+
+

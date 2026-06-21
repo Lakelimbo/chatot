@@ -15,6 +15,15 @@ There are a few message commands, which returns the most suitable result found o
 | `{{<name>}}`        | `{{typeIcon}}`        | Returns a template on Bulbapedia                                                       |
 | `{{Module:<name>}}` | `{{module:kanban}}`   | Returns a Lua module on Bulbapedia                                                     |
 
+They can be enabled (or disabled) with the following environment variables (all are boolean):
+
+| Environment variable       | Default |
+| ---------------------------| ------- |
+| `ENABLE_REGULAR_WIKILINKS` | `true`  |
+| `ENABLE_FILE_LINKS`        | `true`  |
+| `ENABLE_TEMPLATE_LINKS`    | `false` |
+| `ENABLE_MODULE_LINKS`      | `false` |
+
 ### Slash commands
 
 - `/revid`: Get a specific revision
